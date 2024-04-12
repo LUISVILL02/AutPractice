@@ -36,6 +36,10 @@ void leerMuestras(char *fileName, int ***matriz, int numMuestras, int canMuestra
     fscanf(file, "%d %d", &cantidadMuestras, &numMues);
 
     *matriz = (int **)malloc(canMuestras * sizeof(int *));
+    if (matriz == NULL) {
+        printf("Error al asignar memoria.\n");
+        exit(EXIT_FAILURE);
+    }
     for (int i = 0; i < canMuestras; i++){
         (*matriz)[i] = (int*)malloc(numMuestras * sizeof(int));
         for (int j = 0; j < numMuestras; j++){
@@ -84,6 +88,11 @@ int main(int argc, char *argv[]){
             printf("\ndesviacion conjunto de muestras %d: %f ",k+1 , desviacion);
             printf("\ncoeficiente conjunto de muestras %d: %f ",k+1 , coeficiente);
         } 
+        close(tub[0]);
+        for ( int j = 0; j < cantMuestras; j++){
+            free(matriz[j]);
+        }
+        free(matriz);
         
     }else{
         close(tub[0]);
@@ -108,6 +117,8 @@ int main(int argc, char *argv[]){
 
         coeficiente = desviacion / media;
         write(tub[1], &coeficiente, sizeof(double));
+
+        close(tub[1]);
     }
     
 }
