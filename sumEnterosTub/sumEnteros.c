@@ -59,6 +59,8 @@ int main(int argc, char *argv[]){
     for ( i = 0; i < 2; i++){
         pids[i] = fork();
         if (pids[i] == 0) break;
+        if (pids[i] == -1) error("no se pudo crear el proceso");
+        
     }
     int suma = 0;
     start = delta * i;
