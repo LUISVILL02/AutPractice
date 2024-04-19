@@ -121,5 +121,7 @@ int main(int argc, char *argv[]){
         printf("raiz %d\n", getpid());
     }
 
+    free(pids);
+
     return EXIT_SUCCESS;
 }
