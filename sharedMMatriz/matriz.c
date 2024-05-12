@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     
     ptr = shmat(shmId, NULL, 0);
     create_index((void*)ptr, rows, cols, sizeof(int));
-
+    
     pid_t hijo = fork();
 
     if (hijo == -1) {
