@@ -1,0 +1,6 @@
+5
+Chasis
+Motor
+Transmisión
+Sistema_de_suspensión
+Sistema_de_frenos
