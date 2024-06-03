@@ -7,12 +7,13 @@
 pthread_mutex_t mutex;
 
 char **matriz;
-int secuencias, bases, estudios, diferencias = 0;
+int secuencias, bases, estudios;
 
 typedef struct{
     int indiceI;
     int indiceJ;
-    int tub[2];
+    int tub[100][2];
+    int hilo;
 } Comparacion;
 
 typedef struct{
@@ -54,37 +55,31 @@ void imprimir_secuencias(char ***m, int secuencias, int bases){
     }
 }
 void *comparar(void *arg){
-
     Comparacion *comp = (Comparacion*) arg;
-    printf("secuencias: (%d, %d) ", comp->indiceI, comp->indiceJ);
+    printf("secuencias de hilo %d: (%d, %d) \n", comp->hilo + 1, comp->indiceI, comp->indiceJ);
+    sleep(1);
+
     int i = comp->indiceI;
     int j = comp->indiceJ;
-    int tubRead = comp->tub[0];
-    int tubWrite = comp->tub[1];
+    int hilo = comp->hilo;
+    int tubRead = comp->tub[hilo][0];
+    int tubWrite = comp->tub[hilo][1];
 
     Info info[1000];
-
     int contador = 0;
-
     for (int a = 0; a < bases; a++){
         if (matriz[i][a] != matriz[j][a]){
-            //printf("%c y %c indice: %d\n", matriz[i][a], matriz[j][a], a);
+            pthread_mutex_lock(&mutex);
             info[contador].caracter1 = matriz[i][a];
             info[contador].caracter2 = matriz[j][a];
             info[contador].pos = a;
             contador++;
+            pthread_mutex_unlock(&mutex);
         }
     }
 
-     //write(tubWrite, info, contador * sizeof(Info));
-
-    for (int a = 0; a < contador; a++){
-        printf("\n desde hilo %d Pos %d: %c %c\n", i, info[i].pos, info[i].caracter1, info[i].caracter2);
-    }
-
-    pthread_mutex_lock(&mutex);
-    diferencias += contador;
-    pthread_mutex_unlock(&mutex);
+    if(write(comp->tub[hilo][1], &contador, sizeof(int)) == -1) perror("no se pudo escribir\n");
+    if (write(comp->tub[hilo][1], &info, contador * sizeof(Info)) == -1) error("no se pudo escribir\n");
 
     pthread_exit(0);
 }
@@ -100,36 +95,38 @@ int main(int argc, char **argv){
 
     Comparacion *comp = (Comparacion*)malloc(estudios * sizeof(Comparacion));
 
-    int pipes[estudios][2];
     int index = 0;
     for (int i = 0; i < secuencias; i++){
         for (int j = i + 1; j < secuencias; j++){
-            pipe(pipes[i]);
+            if (pipe(comp[index].tub[index]) == -1) error("no se pudieron crear las tuberias");
             comp[index].indiceI = i;
             comp[index].indiceJ = j;
+            comp[index].hilo = index;
             pthread_create(&hilos[index], NULL, comparar, (void *) &comp[index]);
             index++;
         }
     }
-    Info inf[1000];
-
-    for (int i = 0; i < estudios; i++)
-        pthread_join(hilos[i], NULL);
-
     for (int i = 0; i < index; i++){
-        // close(pipes[i][1]);
-        // Info info[1000];
-        // int nbytes = read(pipes[i][0], info, sizeof(info));
-        // int num_elements = nbytes / sizeof(Info);
+        int c_hijos = 0;
+        read(comp[i].tub[i][0], &c_hijos, sizeof(int));
 
-        // for (int j = 0; j < num_elements; j++) {
-        //     printf("Desde hilo %d, Pos %d: %c %c\n", comp[i].indiceI, info[j].pos, info[j].caracter1, info[j].caracter2);
-        // }
+        printf("----------contador hilo %d: %d----------\n", i + 1, c_hijos);
 
-        close(pipes[i][0]);
+        Info inf[c_hijos];
+
+        read(comp[i].tub[i][0], &inf, c_hijos * sizeof(Info));
+
+        for (int j = 0; j < c_hijos; j++){
+            printf("Pos %d: %c %c\n", inf[j].pos, inf[j].caracter1, inf[j].caracter2);
+        }
+        close(comp[i].tub[i][0]);
+        close(comp[i].tub[i][1]);
     }
 
-    close(comp->tub[1]);
+    for (int i = 0; i < estudios; i++){
+        pthread_join(hilos[i], NULL);
+    }
+    
 
     for (int i = 0; i < secuencias; i++){
         free(matriz[i]);

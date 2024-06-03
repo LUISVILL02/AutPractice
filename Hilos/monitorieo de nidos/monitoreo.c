@@ -49,11 +49,21 @@ void leer_imagen(char *fileName, int ***mat, int *filas, int *columnas){
 }
 
 int vefificar_nido(int ***m, int i, int j, int p){
-    i = (i - 1 == -1) ? i + 1 : i;
-    j = (j - 1 == -1) ? j + 1 : j;
-    
-    for (int a = i - 1; a < i + 2; a++){
-        for (int b = j - 1; b < j + 2; b++){
+    int x, y;
+    x = (i == 0) ? i + 1 : i;
+    y = (j == 0) ? j + 1 : j;
+
+    if (i + 1 == filas){
+        x = i;
+        i -= 1;
+    }
+    if (j + 1 == columnas){
+        y = j;
+        j -= 1;
+    }
+
+    for (int a = x - 1; a < i + 2; a++){
+        for (int b = y - 1; b < j + 2; b++){
             if((*m)[a][b] == p) return 1;
         }
     }

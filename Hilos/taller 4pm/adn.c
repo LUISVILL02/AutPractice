@@ -29,10 +29,9 @@ void leer_archivo(char *fileName){
     cadena = (char *)malloc((tamaño) * sizeof(char ));
     if (cadena == NULL) error("no se puede asignar memoria para la cadena");
 
-    char salto;
     for (int i = 0; i < tamaño; i++){
         if((i % 60) == 0){
-            fscanf(file, "%c\n", &salto);
+            fscanf(file, "\n");
         }
         fscanf(file, "%c", &cadena[i]);
     }
