@@ -32,12 +32,9 @@ void leer_archivo(char *fileName, char ***mat, int *secuencias, int *bases){
     FILE *file;
     file = fopen(fileName, "r");
     if (file == NULL) error("no se pudo abrir el archivo");
-
     fscanf(file, "%d %d", secuencias, bases);
-
     *mat = (char **)malloc(*secuencias * sizeof(char *));
     if (*mat == NULL) error("no se puede asignar memoria para las filas");
-
     for (int i = 0; i < *secuencias; i++) {
         (*mat)[i] = (char *)malloc((*bases) * sizeof(char));
         if ((*mat)[i] == NULL) error("no se puede asignar memoria para las columnas");
@@ -58,13 +55,11 @@ void *comparar(void *arg){
     Comparacion *comp = (Comparacion*) arg;
     printf("secuencias de hilo %d: (%d, %d) \n", comp->hilo + 1, comp->indiceI, comp->indiceJ);
     sleep(1);
-
     int i = comp->indiceI;
     int j = comp->indiceJ;
     int hilo = comp->hilo;
     int tubRead = comp->tub[hilo][0];
     int tubWrite = comp->tub[hilo][1];
-
     Info info[1000];
     int contador = 0;
     for (int a = 0; a < bases; a++){
@@ -77,10 +72,8 @@ void *comparar(void *arg){
             pthread_mutex_unlock(&mutex);
         }
     }
-
     if(write(comp->tub[hilo][1], &contador, sizeof(int)) == -1) perror("no se pudo escribir\n");
     if (write(comp->tub[hilo][1], &info, contador * sizeof(Info)) == -1) error("no se pudo escribir\n");
-
     pthread_exit(0);
 }
 
@@ -109,11 +102,8 @@ int main(int argc, char **argv){
     for (int i = 0; i < index; i++){
         int c_hijos = 0;
         read(comp[i].tub[i][0], &c_hijos, sizeof(int));
-
         printf("----------contador hilo %d: %d----------\n", i + 1, c_hijos);
-
         Info inf[c_hijos];
-
         read(comp[i].tub[i][0], &inf, c_hijos * sizeof(Info));
 
         for (int j = 0; j < c_hijos; j++){
@@ -134,7 +124,6 @@ int main(int argc, char **argv){
     free(hilos);
     free(matriz);
     free(comp);
-
     pthread_mutex_destroy(&mutex);
     return EXIT_SUCCESS;
 }

@@ -72,7 +72,6 @@ int vefificar_nido(int ***m, int i, int j, int p){
 
 void *buscar_nidos(void *arg){
     Indices *indice = (Indices *) arg;
-
     for (int i = indice->startF; i < indice->endF; i++){
         for (int j = indice->startC; j < indice->endC; j++){
             if (matriz[i][j] == 1){
@@ -104,10 +103,8 @@ int main(int argc, char **argv){
     for (int i = 0; i < numHilos; i++){
         indice[i].startC = (i % 2 == 0) ? 0 : columnas / 2;
         indice[i].endC = (i % 2 == 0) ? columnas / 2 : columnas;
-
         indice[i].startF = (i < 2) ? 0 : filas / 2;
         indice[i].endF = (i < 2) ? filas / 2 : filas;
-
         pthread_create(&hilos[i], NULL, buscar_nidos, (void *) &indice[i]);
     }
 

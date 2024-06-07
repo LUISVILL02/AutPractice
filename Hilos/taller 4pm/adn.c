@@ -21,14 +21,10 @@ void leer_archivo(char *fileName){
     FILE *file;
     file = fopen(fileName, "r");
     if (file == NULL) error("no se pudo abrir el archivo");
-
     fscanf(file, "%d\n", &tamaño);
-
     printf("tamaño: %d\n", tamaño);
-
     cadena = (char *)malloc((tamaño) * sizeof(char ));
     if (cadena == NULL) error("no se puede asignar memoria para la cadena");
-
     for (int i = 0; i < tamaño; i++){
         if((i % 60) == 0){
             fscanf(file, "\n");
@@ -61,9 +57,7 @@ void escribir_complemento(char *fileName){
     FILE *file;
     file = fopen(fileName, "w");
     if (file == NULL) error("no se pudo abrir el archivo");
-
     fprintf(file, "%d\n", tamaño);
-
     int c = 0;
     for (int i = 0; i < tamaño; i++){
         if (c != 59){           
@@ -107,7 +101,6 @@ int main(int argc, char **argv){
     for (int i = 0; i < numHilos; i++){
         index[i].indice_inicio = i * delta;
         index[i].indice_fin = index[i].indice_inicio + delta;
-
         if (i == numHilos - 1) index[i].indice_fin = tamaño;
         pthread_create(&hilos[i], NULL, complemento, (void *)&index[i]);
     }

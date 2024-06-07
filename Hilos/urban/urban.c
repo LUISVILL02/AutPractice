@@ -14,15 +14,11 @@ void leer_imagen(char *fileName){
     FILE *file;
     file = fopen(fileName, "r");
     if (file == NULL) error("no se pudo abir el archivo");
-
     fscanf(file, "%d %d %d", &numDias, &filas, &columnas);
-
     matriz = (int **)malloc(filas * sizeof(int *));
     if (matriz == NULL) error("no se puede asignar memoria para las filas");
-
     aux = (int **)malloc(filas * sizeof(int *));
     if (aux == NULL) error("no se puede asignar memoria para las filas");
-
     for (int i = 0; i < filas; i++){
         matriz[i] = (int *)malloc(columnas * sizeof(int));
         aux[i] = (int *)malloc(columnas * sizeof(int));
@@ -39,7 +35,6 @@ int vefificar_vecinos(int i, int j, int v1, int v2){
     int x, y;
     x = (i == 0) ? i + 1: i;
     y = (j == 0) ? j + 1: j;
-
     if(i + 1 == filas){
         x = i;
         i -= 1;
@@ -48,7 +43,6 @@ int vefificar_vecinos(int i, int j, int v1, int v2){
         y = j;
         j -= 1;
     }
-
     int vecinos = 0;
     for (int a = x - 1; a < i + 2; a++){
         for (int b = y - 1; b < j + 2; b++){
@@ -83,7 +77,6 @@ void *baja_a_media(void *arg){
         }
         turno = 1;
     }
-    
 }
 void *media_a_baja(void *arg){
     for (int i = 0; i < numDias; i++){
